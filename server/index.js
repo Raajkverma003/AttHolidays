@@ -42,15 +42,20 @@ app.use('/api/bookings', require('./routes/bookings'));
 
 // Test Route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date() });
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  res.json({ 
+    status: 'healthy', 
+    database: dbStatus,
+    timestamp: new Date() 
+  });
 });
 
 // Start Server
-const PORT = process.env.PORT;
-if (!PORT) {
-  console.error('CRITICAL ERROR: PORT is not defined in the environment variables.');
-  process.exit(1);
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`Backend server is running on port ${PORT}`);
+  });
 }
-app.listen(PORT, () => {
-  console.log(`Backend server is running on port ${PORT}`);
-});
+
+module.exports = app;

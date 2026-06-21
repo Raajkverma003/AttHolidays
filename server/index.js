@@ -18,40 +18,59 @@ app.use(express.json());
 app.use(cors());
 
 // DB Connection
-const connectDB = async () => {
-  try {
-    const connStr = process.env.MONGO_URI;
-    if (!connStr) {
-      console.error('CRITICAL ERROR: MONGO_URI is not defined in the environment variables.');
-      if (!process.env.VERCEL) {
-        process.exit(1);
-      }
-      return;
-    }
-    await mongoose.connect(connStr);
-    console.log('MongoDB connected successfully');
-  } catch (err) {
-    console.error('MongoDB database connection error:', err.message);
+let dbPromise = null;
+
+const connectDB = () => {
+  if (dbPromise) return dbPromise;
+
+  const connStr = process.env.MONGO_URI;
+  if (!connStr) {
+    const errorMsg = 'MONGO_URI is not defined in the environment variables.';
+    console.error(`CRITICAL ERROR: ${errorMsg}`);
     if (!process.env.VERCEL) {
       process.exit(1);
     }
+    return Promise.reject(new Error(errorMsg));
   }
+
+  dbPromise = mongoose.connect(connStr)
+    .then(() => {
+      console.log('MongoDB connected successfully');
+    })
+    .catch(err => {
+      console.error('MongoDB database connection error:', err.message);
+      dbPromise = null; // Reset promise so subsequent requests can retry
+      if (!process.env.VERCEL) {
+        process.exit(1);
+      }
+      throw err;
+    });
+
+  return dbPromise;
 };
 
-connectDB();
+// Start initial connection attempt
+connectDB().catch(() => {});
 
 // Database status check middleware for routes
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (req.path === '/api/health') {
     return next();
   }
-  if (mongoose.connection.readyState !== 1) {
+
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      console.log(`Database status check: connection readyState is ${mongoose.connection.readyState}. Waiting for connection...`);
+      await connectDB();
+    }
+    next();
+  } catch (err) {
     return res.status(500).json({
-      error: 'Database connection is not established.',
-      message: 'Ensure MONGO_URI is correctly configured in your Vercel Environment Variables. If you are deploying to production, this must be a remote cloud MongoDB Atlas connection, not a local (localhost) database.'
+      error: 'Database connection failed',
+      message: err.message,
+      hint: 'Ensure MONGO_URI is correctly configured in your Vercel Environment Variables. If you are deploying to production, this must be a remote cloud MongoDB Atlas connection, not a local (localhost) database.'
     });
   }
-  next();
 });
 
 // Mount Routes

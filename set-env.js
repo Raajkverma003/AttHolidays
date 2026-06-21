@@ -30,7 +30,13 @@ if (!fs.existsSync(dir)) {
 const targetPath = path.join(dir, 'environment.ts');
 const targetDevPath = path.join(dir, 'environment.development.ts');
 
-let apiUrl = process.env.API_URL || 'http://localhost:5001/api';
+let apiUrl = process.env.API_URL;
+if (!apiUrl && process.env.VERCEL_URL) {
+  apiUrl = `https://${process.env.VERCEL_URL}/api`;
+}
+if (!apiUrl) {
+  apiUrl = 'http://localhost:5001/api';
+}
 if (apiUrl.endsWith('/')) {
   apiUrl = apiUrl.slice(0, -1);
 }

@@ -1,0 +1,31 @@
+.admin-wrapper {
+  width: 95%;
+  max-width: 1300px;
+  margin: 40px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.admin-header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.admin-header p {
+  color: var(--text-tertiary);
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+.admin-tabs {
+  padding: 10px;
+}
+
+.tab-content {
+  padding: 30px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

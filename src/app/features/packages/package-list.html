@@ -1,0 +1,209 @@
+<div class="catalog-wrapper">
+  <!-- Sidebar Filters -->
+  <aside class="filters-sidebar glassmorphism">
+    <div class="sidebar-header">
+      <h3>Filter Packages</h3>
+      <button mat-button color="primary" (click)="resetFilters()">Reset All</button>
+    </div>
+
+    <form [formGroup]="filterForm" class="filters-form">
+      <!-- Location Search -->
+      <div class="filter-group">
+        <label class="filter-label">Destination</label>
+        <div class="search-input-wrapper">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input type="text" formControlName="location" placeholder="e.g. Paris, Bali..." class="text-input">
+        </div>
+      </div>
+
+      <!-- Max Price Slider -->
+      <div class="filter-group">
+        <label class="filter-label">Max Budget: ${{ filterForm.get('price')?.value }}</label>
+        <mat-slider min="200" max="3000" step="50" class="price-slider">
+          <input matSliderThumb formControlName="price">
+        </mat-slider>
+      </div>
+
+      <!-- Star Rating -->
+      <div class="filter-group">
+        <label class="filter-label">Hotel Rating</label>
+        <mat-select formControlName="starCategory" class="custom-select">
+          <mat-option [value]="0">Any Accommodation</mat-option>
+          <mat-option [value]="3">3★ Properties</mat-option>
+          <mat-option [value]="4">4★ Properties</mat-option>
+          <mat-option [value]="5">5★ Luxury Resorts</mat-option>
+        </mat-select>
+      </div>
+
+      <!-- Travel Type -->
+      <div class="filter-group">
+        <label class="filter-label">Travel Type</label>
+        <mat-select formControlName="travelType" class="custom-select">
+          <mat-option value="">Any Travel Type</mat-option>
+          <mat-option value="standard">Standard Holidays</mat-option>
+          <mat-option value="custom">Customizable Escapes</mat-option>
+          <mat-option value="group">Group Guided Tours</mat-option>
+        </mat-select>
+      </div>
+
+      <!-- Last Minute Toggle -->
+      <div class="filter-group checkbox-group">
+        <mat-checkbox formControlName="isLastMinute" color="primary">
+          <span class="chk-label">Last-Minute Deals Only</span>
+        </mat-checkbox>
+      </div>
+
+      <!-- Amenities Group -->
+      <div class="filter-group">
+        <label class="filter-label">Amenities</label>
+        <div class="amenities-checkboxes">
+          <div class="checkbox-group">
+            <mat-checkbox formControlName="wifi" color="primary">
+              <span class="chk-label"><mat-icon class="amenity-inline-icon">wifi</mat-icon> Wi-Fi</span>
+            </mat-checkbox>
+          </div>
+          <div class="checkbox-group">
+            <mat-checkbox formControlName="pool" color="primary">
+              <span class="chk-label"><mat-icon class="amenity-inline-icon">pool</mat-icon> Swimming Pool</span>
+            </mat-checkbox>
+          </div>
+          <div class="checkbox-group">
+            <mat-checkbox formControlName="gym" color="primary">
+              <span class="chk-label"><mat-icon class="amenity-inline-icon">fitness_center</mat-icon> Gym / Fitness</span>
+            </mat-checkbox>
+          </div>
+          <div class="checkbox-group">
+            <mat-checkbox formControlName="bar" color="primary">
+              <span class="chk-label"><mat-icon class="amenity-inline-icon">local_bar</mat-icon> Bar / Lounge</span>
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+    </form>
+  </aside>
+
+  <!-- Package Listings -->
+  <main class="listings-container">
+    @if (isLoading()) {
+      <div class="spinner-container">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    } @else {
+      <div class="listings-header">
+        <h2>{{ packages().length }} Destination Packages Found</h2>
+      </div>
+
+      <div class="packages-grid">
+        @for (pkg of packages(); track pkg._id) {
+          <mat-card class="package-card glassmorphism">
+            <div class="card-img-container">
+              <img [src]="pkg.images[0] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800'" [alt]="pkg.title" class="package-img">
+              <span class="type-badge" [class]="pkg.travelType">{{ pkg.travelType | uppercase }}</span>
+              @if (pkg.isLastMinute) {
+                <span class="flash-deal-badge">FLASH SALE</span>
+              }
+            </div>
+
+            <mat-card-content class="package-content">
+              <div class="package-meta">
+                <span class="location">
+                  <mat-icon>location_on</mat-icon> {{ pkg.location }}
+                </span>
+                <span class="star-pill">
+                  <mat-icon>star</mat-icon> {{ pkg.starCategory }}★ Hotel
+                </span>
+              </div>
+
+              <h3 class="package-title">{{ pkg.title }}</h3>
+              
+              <div class="inclusions-row">
+                @if (pkg.inclusions.airportPickup) {
+                  <span class="inclusion-pill" title="Airport Pickup included">
+                    <mat-icon>local_taxi</mat-icon> Transfer
+                  </span>
+                }
+                @if (pkg.inclusions.breakfast) {
+                  <span class="inclusion-pill" title="Daily Breakfast included">
+                    <mat-icon>restaurant</mat-icon> Breakfast
+                  </span>
+                }
+                @if (pkg.inclusions.dinnerBuffet) {
+                  <span class="inclusion-pill" title="Dinner Buffet included">
+                    <mat-icon>dinner_dining</mat-icon> Dinner
+                  </span>
+                }
+                @if (pkg.inclusions.visaServices) {
+                  <span class="inclusion-pill" title="Visa processing included">
+                    <mat-icon>verified</mat-icon> Visa
+                  </span>
+                }
+              </div>
+
+              @if (pkg.amenities) {
+                <div class="amenities-row">
+                  @if (pkg.amenities.wifi) {
+                    <span class="amenity-pill" title="Free Wi-Fi Available">
+                      <mat-icon>wifi</mat-icon> Wi-Fi
+                    </span>
+                  }
+                  @if (pkg.amenities.pool) {
+                    <span class="amenity-pill" title="Swimming Pool Available">
+                      <mat-icon>pool</mat-icon> Pool
+                    </span>
+                  }
+                  @if (pkg.amenities.gym) {
+                    <span class="amenity-pill" title="Gym / Fitness Center Available">
+                      <mat-icon>fitness_center</mat-icon> Gym
+                    </span>
+                  }
+                  @if (pkg.amenities.bar) {
+                    <span class="amenity-pill" title="Bar / Lounge Available">
+                      <mat-icon>local_bar</mat-icon> Bar
+                    </span>
+                  }
+                </div>
+              }
+
+              <p class="description">{{ pkg.description }}</p>
+
+              <div class="activities-preview">
+                <strong>Highlights:</strong>
+                <span class="act-tags">
+                  @for (act of pkg.activities.slice(0, 3); track $index) {
+                    <span class="tag">{{ act }}</span>
+                  }
+                  @if (pkg.activities.length > 3) {
+                    <span class="tag-more">+{{ pkg.activities.length - 3 }} more</span>
+                  }
+                </span>
+              </div>
+
+              <div class="pricing-actions">
+                <div class="price-container">
+                  @if (pkg.isLastMinute && pkg.lastMinutePrice) {
+                    <span class="old-price">${{ pkg.price }}</span>
+                    <span class="price">${{ pkg.lastMinutePrice }}</span>
+                  } @else {
+                    <span class="price">${{ pkg.price }}</span>
+                  }
+                  <span class="per-person">per traveler</span>
+                </div>
+
+                <a [routerLink]="['/packages', pkg._id]" mat-flat-button color="primary" class="explore-btn">
+                  View Itinerary <mat-icon>arrow_forward</mat-icon>
+                </a>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        } @empty {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">travel_explore</mat-icon>
+            <h3>No Vacation Packages Match Your Filters</h3>
+            <p>Try resetting the filters or broadening your search parameters.</p>
+            <button mat-flat-button color="primary" (click)="resetFilters()">Show All Packages</button>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

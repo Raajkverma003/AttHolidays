@@ -1,0 +1,157 @@
+<div class="home-wrapper">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Craft Your Perfect Holiday, Your Way</h1>
+      <p class="hero-subtitle">Choose from our premium standard itineraries or dynamically build your custom dream vacation.</p>
+      <div class="hero-actions">
+        <a routerLink="/packages" mat-flat-button color="primary" class="hero-btn primary-btn glow-btn">
+          <mat-icon>explore</mat-icon> Explore Packages
+        </a>
+        <a routerLink="/custom-builder" mat-flat-button color="accent" class="hero-btn accent-btn glow-btn">
+          <mat-icon>architecture</mat-icon> Build Custom Trip
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Last Minute Deals -->
+  <section class="deals-section">
+    <div class="section-header">
+      <h2 class="section-title">Last-Minute Flash Deals</h2>
+      <p class="section-desc">Grab these exclusive discounts before they vanish!</p>
+    </div>
+
+    @if (isLoading()) {
+      <div class="spinner-container">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    } @else {
+      <div class="deals-grid">
+        @for (pkg of lastMinutePackages(); track pkg._id) {
+          <mat-card class="deal-card glassmorphism">
+            <div class="card-image-wrapper">
+              <img [src]="pkg.images[0] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800'" [alt]="pkg.title" class="deal-image">
+              <span class="deal-badge">SAVE ${{ (pkg.price || 0) - (pkg.lastMinutePrice || 0) }}</span>
+            </div>
+            <mat-card-content class="deal-content">
+              <h3 class="deal-title">{{ pkg.title }}</h3>
+              <p class="deal-location">
+                <mat-icon>location_on</mat-icon> {{ pkg.location }}
+              </p>
+              <div class="star-rating">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <mat-icon class="star-icon" [class.filled]="star <= (pkg.ratings?.average || 5)">star</mat-icon>
+                }
+                <span class="review-count">({{ pkg.ratings?.count || 0 }} reviews)</span>
+              </div>
+              <p class="deal-description">{{ pkg.description }}</p>
+              <div class="price-row">
+                <span class="original-price">${{ pkg.price }}</span>
+                <span class="deal-price">${{ pkg.lastMinutePrice }}</span>
+              </div>
+            </mat-card-content>
+            <mat-card-actions class="deal-actions">
+              <a [routerLink]="['/packages', pkg._id]" mat-button color="primary" class="details-link">
+                View Deal <mat-icon>arrow_forward</mat-icon>
+              </a>
+            </mat-card-actions>
+          </mat-card>
+        } @empty {
+          <div class="no-deals">
+            <mat-icon class="no-deals-icon">celebration</mat-icon>
+            <p>Check back later for exciting flash deals!</p>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Premium Travel Kitty Section -->
+  <section class="kitty-intro-section">
+    <div class="kitty-intro-content">
+      <div class="kitty-header">
+        <h2 class="section-title">Premium Travel Kitty (Subscription)</h2>
+        <p class="section-desc">Unlock massive travel bonuses, points multiplier, and exclusive priority support.</p>
+      </div>
+
+      <div class="kitty-tiers">
+        <div class="tier-card bronze">
+          <div class="tier-icon-wrapper">
+            <mat-icon class="tier-icon">military_tech</mat-icon>
+          </div>
+          <h3>Bronze Tier</h3>
+          <p class="price">$19/mo</p>
+          <ul class="tier-benefits">
+            <li><mat-icon>check_circle</mat-icon> 100 Sign-up Travel Points</li>
+            <li><mat-icon>check_circle</mat-icon> 5% points multiplier on bookings</li>
+            <li><mat-icon>check_circle</mat-icon> Access to Bronze last-minute deals</li>
+          </ul>
+          <a routerLink="/dashboard" mat-stroked-button class="tier-btn">Subscribe Bronze</a>
+        </div>
+
+        <div class="tier-card silver featured">
+          <div class="featured-badge">POPULAR</div>
+          <div class="tier-icon-wrapper">
+            <mat-icon class="tier-icon">workspace_premium</mat-icon>
+          </div>
+          <h3>Silver Tier</h3>
+          <p class="price">$49/mo</p>
+          <ul class="tier-benefits">
+            <li><mat-icon>check_circle</mat-icon> 250 Sign-up Travel Points</li>
+            <li><mat-icon>check_circle</mat-icon> 10% points multiplier on bookings</li>
+            <li><mat-icon>check_circle</mat-icon> Free customized itinerary consultation</li>
+            <li><mat-icon>check_circle</mat-icon> Access to Silver flash sales</li>
+          </ul>
+          <a routerLink="/dashboard" mat-flat-button color="primary" class="tier-btn featured-btn">Subscribe Silver</a>
+        </div>
+
+        <div class="tier-card gold">
+          <div class="tier-icon-wrapper">
+            <mat-icon class="tier-icon">stars</mat-icon>
+          </div>
+          <h3>Gold Tier</h3>
+          <p class="price">$99/mo</p>
+          <ul class="tier-benefits">
+            <li><mat-icon>check_circle</mat-icon> 600 Sign-up Travel Points</li>
+            <li><mat-icon>check_circle</mat-icon> 20% points multiplier on bookings</li>
+            <li><mat-icon>check_circle</mat-icon> Free Visa Guidance & Processing support</li>
+            <li><mat-icon>check_circle</mat-icon> 24/7 dedicated personal concierge</li>
+          </ul>
+          <a routerLink="/dashboard" mat-stroked-button class="tier-btn">Subscribe Gold</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AttHolidays Core Offerings -->
+  <section class="services-overview">
+    <div class="section-header">
+      <h2 class="section-title">Our Specialized Services</h2>
+      <p class="section-desc">We offer complete end-to-end holiday solutions for all travel preferences.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card glassmorphism">
+        <mat-icon class="service-icon">edit_road</mat-icon>
+        <h3>Customized Stepper Trips</h3>
+        <p>Swap hotel tiers, toggle flights, activities, and visa assist live with our Dynamic Package Builder.</p>
+        <a routerLink="/custom-builder" mat-button color="accent">Build Itinerary <mat-icon>arrow_right</mat-icon></a>
+      </div>
+
+      <div class="service-card glassmorphism">
+        <mat-icon class="service-icon">groups</mat-icon>
+        <h3>Curated Group Packages</h3>
+        <p>Enjoy pre-planned vacations led by local tour guides with luxury coaches and standard group meals.</p>
+        <a routerLink="/packages" [queryParams]="{travelType: 'group'}" mat-button color="accent">Browse Groups <mat-icon>arrow_right</mat-icon></a>
+      </div>
+
+      <div class="service-card glassmorphism">
+        <mat-icon class="service-icon">verified_user</mat-icon>
+        <h3>Visa Services</h3>
+        <p>Hassle-free document preparation, application filling, and booking submission with local consulates.</p>
+        <a routerLink="/packages" mat-button color="accent">Explore Packages <mat-icon>arrow_right</mat-icon></a>
+      </div>
+    </div>
+  </section>
+</div>

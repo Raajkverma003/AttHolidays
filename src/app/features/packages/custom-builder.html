@@ -1,0 +1,215 @@
+<div class="builder-wrapper">
+  <div class="builder-header">
+    <h2>Interactive Custom Holiday Builder</h2>
+    <p>Tailor your accommodation, toggle activities, and add travel protections dynamically.</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else {
+    <div class="stepper-grid">
+      <!-- Stepper Panel -->
+      <mat-stepper linear #stepper class="custom-stepper glassmorphism">
+        <!-- Step 1: Destination -->
+        <mat-step [stepControl]="destForm">
+          <ng-template matStepLabel>Destination</ng-template>
+          <div class="step-content">
+            <h3>Choose Base Destination</h3>
+            <form [formGroup]="destForm">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Select Vacation Package</mat-label>
+                <mat-select formControlName="packageId" (selectionChange)="onPackageSelect($event.value)" id="stepper-pkg-select">
+                  @for (pkg of packages(); track pkg._id) {
+                    <mat-option [value]="pkg._id">{{ pkg.title }} - Starting at ${{ pkg.price }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </form>
+
+            @if (selectedPackage(); as selected) {
+              <div class="dest-preview-card">
+                <img [src]="selected.images[0]" class="preview-img">
+                <div class="preview-text">
+                  <h4>{{ selected.title }}</h4>
+                  <p>{{ selected.description }}</p>
+                  <span class="meta-tag"><mat-icon>location_on</mat-icon> {{ selected.location }}</span>
+                </div>
+              </div>
+            }
+
+            <div class="step-actions">
+              <button mat-flat-button color="primary" matStepperNext [disabled]="destForm.invalid">Next Step</button>
+            </div>
+          </div>
+        </mat-step>
+
+        <!-- Step 2: Accommodation Tier -->
+        <mat-step [stepControl]="configForm">
+          <ng-template matStepLabel>Accommodation</ng-template>
+          <div class="step-content">
+            <h3>Select Accommodation Tier</h3>
+            <p class="step-desc">Modify your default hotel properties. Prices adjust dynamically based on tier selection.</p>
+            
+            <form [formGroup]="configForm">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Hotel Category</mat-label>
+                <mat-select formControlName="starCategory" id="stepper-stars-select">
+                  <mat-option [value]="3">3★ Standard Property (-$100)</mat-option>
+                  <mat-option [value]="4">4★ Premium Property (Included)</mat-option>
+                  <mat-option [value]="5">5★ Luxury Resort (+$250)</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </form>
+
+            <div class="hotel-cards">
+              <div class="hotel-card" [class.active]="configForm.get('starCategory')?.value === 3">
+                <mat-icon class="hotel-icon">business</mat-icon>
+                <h4>3★ Standard</h4>
+                <p>Cozy budget-friendly lodging, clean private rooms, basic amenities.</p>
+              </div>
+              <div class="hotel-card" [class.active]="configForm.get('starCategory')?.value === 4">
+                <mat-icon class="hotel-icon">domain</mat-icon>
+                <h4>4★ Premium</h4>
+                <p>Boutique hotels with premium rooms, pool, gym, and local lounges.</p>
+              </div>
+              <div class="hotel-card" [class.active]="configForm.get('starCategory')?.value === 5">
+                <mat-icon class="hotel-icon">holiday_village</mat-icon>
+                <h4>5★ Luxury</h4>
+                <p>World-class resorts, absolute ocean/peak vistas, massage spas.</p>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-flat-button color="primary" matStepperNext>Next Step</button>
+            </div>
+          </div>
+        </mat-step>
+
+        <!-- Step 3: Upgrades & Activities -->
+        <mat-step [stepControl]="configForm">
+          <ng-template matStepLabel>Inclusions & Activities</ng-template>
+          <div class="step-content">
+            <h3>Customize Inclusions & Experiences</h3>
+            
+            <form [formGroup]="configForm" class="upgrades-form">
+              <div class="upgrades-group">
+                <h4>Inclusions Upgrades</h4>
+                <div class="checklist-grid">
+                  <mat-checkbox formControlName="airportPickup" color="primary">
+                    <span class="chk-lbl">Airport Pickup & Taxi (+$50)</span>
+                  </mat-checkbox>
+                  <mat-checkbox formControlName="breakfast" color="primary">
+                    <span class="chk-lbl">Complimentary Breakfast (+$30)</span>
+                  </mat-checkbox>
+                  <mat-checkbox formControlName="dinnerBuffet" color="primary">
+                    <span class="chk-lbl">Buffet Dinners (+$75)</span>
+                  </mat-checkbox>
+                  <mat-checkbox formControlName="visaServices" color="primary">
+                    <span class="chk-lbl">Visa Support Filing (+$120)</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+
+              @if (selectedPackage(); as selected) {
+                <div class="upgrades-group">
+                  <h4>Activities Choices (+$40 each)</h4>
+                  <div class="checklist-grid" formGroupName="activities">
+                    @for (act of getActivitiesControls(); track act) {
+                      <mat-checkbox [formControlName]="act" color="primary">
+                        <span class="chk-lbl">{{ act }}</span>
+                      </mat-checkbox>
+                    }
+                  </div>
+                </div>
+              }
+            </form>
+
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-flat-button color="primary" matStepperNext>Next Step</button>
+            </div>
+          </div>
+        </mat-step>
+
+        <!-- Step 4: Summary & Check out -->
+        <mat-step [stepControl]="dateForm">
+          <ng-template matStepLabel>Checkout</ng-template>
+          <div class="step-content">
+            <h3>Confirm Custom Reservation</h3>
+            
+            <form [formGroup]="dateForm" class="date-checkout-form">
+              <div class="checkout-input-group">
+                <label class="checkout-date-lbl">Departure Date</label>
+                <input type="date" formControlName="travelDate" class="checkout-date-input" id="stepper-travel-date">
+                @if (dateForm.get('travelDate')?.invalid && dateForm.get('travelDate')?.touched) {
+                  <p class="error-msg">Departure date is required.</p>
+                }
+              </div>
+            </form>
+
+            <div class="summary-review glassmorphism">
+              <h4>Custom Package Configuration Summary</h4>
+              @if (selectedPackage(); as selected) {
+                <div class="summary-item">
+                  <span class="lbl">Base Destination:</span>
+                  <span class="val">{{ selected.title }} (${{ selected.price }})</span>
+                </div>
+                <div class="summary-item">
+                  <span class="lbl">Accommodation Choice:</span>
+                  <span class="val">
+                    {{ configForm.get('starCategory')?.value }}★ Hotel Tier 
+                    ({{ configForm.get('starCategory')?.value === 3 ? '-$100' : (configForm.get('starCategory')?.value === 5 ? '+$250' : '$0') }})
+                  </span>
+                </div>
+                <div class="summary-item">
+                  <span class="lbl">Upgraded Inclusions:</span>
+                  <span class="val">
+                    @if (configForm.get('airportPickup')?.value) { Taxi (+$50) }
+                    @if (configForm.get('breakfast')?.value) { Breakfast (+$30) }
+                    @if (configForm.get('dinnerBuffet')?.value) { Dinner (+$75) }
+                    @if (configForm.get('visaServices')?.value) { Visa Assistance (+$120) }
+                    @if (!configForm.get('airportPickup')?.value && !configForm.get('breakfast')?.value && !configForm.get('dinnerBuffet')?.value && !configForm.get('visaServices')?.value) { None }
+                  </span>
+                </div>
+              }
+            </div>
+
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>Back</button>
+              
+              @if (authService.isLoggedIn()) {
+                <button mat-flat-button color="accent" id="custom-book-submit-btn" (click)="submitCustomBooking()" [disabled]="dateForm.invalid || isSubmitting()" class="checkout-btn">
+                  @if (isSubmitting()) {
+                    <span>Booking...</span>
+                  } @else {
+                    <span>Confirm & Request Custom Package</span>
+                  }
+                </button>
+              } @else {
+                <a routerLink="/login" mat-flat-button color="primary" class="checkout-btn">
+                  Sign In to Book Custom Trip
+                </a>
+              }
+            </div>
+          </div>
+        </mat-step>
+      </mat-stepper>
+
+      <!-- Live Pricing Display Side Panel -->
+      <aside class="price-side-panel glassmorphism">
+        <h4>Live Calculated Quote</h4>
+        <div class="price-bubble">
+          <span class="price-val">${{ calculatedPrice() }}</span>
+          <span class="person-tag">total per traveler</span>
+        </div>
+        
+        <div class="pricing-calculator-notes">
+          <p><mat-icon>info</mat-icon> Swapping hotels, adding dinners or visa processing will instantly update the quote above.</p>
+        </div>
+      </aside>
+    </div>
+  }
+</div>

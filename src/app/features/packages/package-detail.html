@@ -1,0 +1,267 @@
+<div class="detail-wrapper">
+  @if (isLoading()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else {
+    @if (pkg(); as packageData) {
+      <!-- Top Hero Image Section -->
+      <section class="detail-hero" [style.background-image]="'linear-gradient(to bottom, rgba(15,23,42,0.4), rgba(11,15,25,0.95)), url(' + (packageData.images[0] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600') + ')'">
+        <div class="hero-text-container">
+          <div class="back-link-wrapper">
+            <a routerLink="/packages" class="back-link">
+              <mat-icon>arrow_back</mat-icon> Back to Destinations
+            </a>
+          </div>
+          <span class="type-pill" [class]="packageData.travelType">{{ packageData.travelType | uppercase }} TOUR</span>
+          <h1 class="package-title">{{ packageData.title }}</h1>
+          <div class="meta-row">
+            <span class="meta-item"><mat-icon>location_on</mat-icon> {{ packageData.location }}</span>
+            <span class="meta-item"><mat-icon>hotel</mat-icon> {{ packageData.starCategory }}★ Hotel Property</span>
+            <span class="meta-item"><mat-icon>schedule</mat-icon> {{ packageData.itinerary.length }} Days / {{ packageData.itinerary.length - 1 }} Nights</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Columns Grid -->
+      <div class="main-grid">
+        <!-- Content Pane -->
+        <div class="details-pane">
+          <mat-tab-group mat-stretch-tabs="false" animationDuration="300ms" class="details-tabs glassmorphism">
+            <!-- Itinerary Tab -->
+            <mat-tab label="Daily Itinerary">
+              <div class="tab-body-wrapper">
+                <div class="itinerary-timeline">
+                  @for (day of packageData.itinerary; track day.day) {
+                    <div class="timeline-item">
+                      <div class="timeline-badge">Day {{ day.day }}</div>
+                      <div class="timeline-content">
+                        <h4>{{ day.title }}</h4>
+                        <p>{{ day.details }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </mat-tab>
+
+            <!-- Inclusions & Places Tab -->
+            <mat-tab label="What's Included">
+              <div class="tab-body-wrapper inclusions-tab">
+                <h3>What is Included in the Price</h3>
+                <div class="inclusions-grid">
+                  <div class="inclusion-box" [class.included]="packageData.inclusions.airportPickup">
+                    <mat-icon class="box-icon">local_taxi</mat-icon>
+                    <div class="box-details">
+                      <h5>Airport Transfers</h5>
+                      <p>{{ packageData.inclusions.airportPickup ? 'Private pickup & drop-off included' : 'Not included in base price' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="inclusion-box" [class.included]="packageData.inclusions.breakfast">
+                    <mat-icon class="box-icon">restaurant</mat-icon>
+                    <div class="box-details">
+                      <h5>Daily Breakfast</h5>
+                      <p>{{ packageData.inclusions.breakfast ? 'Complimentary hotel breakfast included' : 'Breakfast not provided' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="inclusion-box" [class.included]="packageData.inclusions.dinnerBuffet">
+                    <mat-icon class="box-icon">dinner_dining</mat-icon>
+                    <div class="box-details">
+                      <h5>Dinner Buffet</h5>
+                      <p>{{ packageData.inclusions.dinnerBuffet ? 'Premium buffet dining included' : 'Dinner is self-funded' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="inclusion-box" [class.included]="packageData.inclusions.visaServices">
+                    <mat-icon class="box-icon">verified</mat-icon>
+                    <div class="box-details">
+                      <h5>Visa Services</h5>
+                      <p>{{ packageData.inclusions.visaServices ? 'Visa application filing support included' : 'Visa cost extra' }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="places-section">
+                  <h3>Tourist Spots Covered</h3>
+                  <div class="places-tags">
+                    @for (place of packageData.touristPlaces; track place) {
+                      <span class="place-tag"><mat-icon>photo_camera</mat-icon> {{ place }}</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="amenities-section">
+                  <h3>Hotel Amenities & Services</h3>
+                  <div class="amenities-grid-detail">
+                    <div class="amenity-box-detail" [class.enabled]="packageData.amenities?.wifi">
+                      <mat-icon class="box-icon">wifi</mat-icon>
+                      <div class="box-details">
+                        <h5>High-Speed Wi-Fi</h5>
+                        <p>{{ packageData.amenities?.wifi ? 'Free unlimited internet access' : 'No complimentary Wi-Fi' }}</p>
+                      </div>
+                    </div>
+
+                    <div class="amenity-box-detail" [class.enabled]="packageData.amenities?.pool">
+                      <mat-icon class="box-icon">pool</mat-icon>
+                      <div class="box-details">
+                        <h5>Swimming Pool</h5>
+                        <p>{{ packageData.amenities?.pool ? 'Access to temperature controlled pool' : 'No swimming pool' }}</p>
+                      </div>
+                    </div>
+
+                    <div class="amenity-box-detail" [class.enabled]="packageData.amenities?.gym">
+                      <mat-icon class="box-icon">fitness_center</mat-icon>
+                      <div class="box-details">
+                        <h5>Fitness Center / Gym</h5>
+                        <p>{{ packageData.amenities?.gym ? 'Fully equipped gym facilities' : 'No gym/fitness facilities' }}</p>
+                      </div>
+                    </div>
+
+                    <div class="amenity-box-detail" [class.enabled]="packageData.amenities?.bar">
+                      <mat-icon class="box-icon">local_bar</mat-icon>
+                      <div class="box-details">
+                        <h5>Bar & Lounge</h5>
+                        <p>{{ packageData.amenities?.bar ? 'On-site bar & cocktail lounge' : 'No on-site bar' }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                @if (packageData.importantDetails) {
+                  <div class="important-section">
+                    <h3>Important General Notes</h3>
+                    <p class="notes-text">{{ packageData.importantDetails }}</p>
+                  </div>
+                }
+              </div>
+            </mat-tab>
+
+            <!-- Reviews Tab -->
+            <mat-tab label="Customer Feedback ({{ packageData.reviews?.length || 0 }})">
+              <div class="tab-body-wrapper reviews-tab">
+                <div class="reviews-summary">
+                  <div class="rating-number">
+                    {{ packageData.ratings?.average?.toFixed(1) || '5.0' }}
+                  </div>
+                  <div class="rating-stars-col">
+                    <div class="stars-row">
+                      @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <mat-icon class="star-icon" [class.filled]="star <= (packageData.ratings?.average || 5)">star</mat-icon>
+                      }
+                    </div>
+                    <span class="count-txt">Based on {{ packageData.ratings?.count || 0 }} reviews</span>
+                  </div>
+                </div>
+
+                <!-- Review list -->
+                <div class="reviews-list">
+                  @for (rev of packageData.reviews; track rev.createdAt) {
+                    <div class="review-item">
+                      <div class="review-header">
+                        <span class="username">{{ rev.username }}</span>
+                        <span class="stars">
+                          @for (s of [1, 2, 3, 4, 5]; track s) {
+                            <mat-icon class="rev-star" [class.filled]="s <= rev.rating">star</mat-icon>
+                          }
+                        </span>
+                      </div>
+                      <p class="comment">{{ rev.comment }}</p>
+                    </div>
+                  } @empty {
+                    <p class="no-reviews">No customer reviews yet. Be the first to write one!</p>
+                  }
+                </div>
+
+                <!-- Write Review Form -->
+                <div class="write-review-section">
+                  @if (authService.isLoggedIn()) {
+                    <h3>Write a Review</h3>
+                    <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
+                      <mat-form-field appearance="outline" class="form-field-small">
+                        <mat-label>Score Rating (1-5)</mat-label>
+                        <input matInput type="number" min="1" max="5" formControlName="rating">
+                        @if (reviewForm.get('rating')?.invalid) {
+                          <mat-error>Rating must be between 1 and 5</mat-error>
+                        }
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline" class="form-field-large">
+                        <mat-label>Your Feedback Details</mat-label>
+                        <textarea matInput rows="3" formControlName="comment" placeholder="Tell us about your experience..."></textarea>
+                        @if (reviewForm.get('comment')?.invalid) {
+                          <mat-error>Comment must be at least 5 characters long</mat-error>
+                        }
+                      </mat-form-field>
+
+                      <button mat-raised-button color="primary" type="submit" [disabled]="reviewForm.invalid || reviewLoading()">
+                        @if (reviewLoading()) {
+                          <span>Submitting...</span>
+                        } @else {
+                          <span>Submit Feedback</span>
+                        }
+                      </button>
+                    </form>
+                  } @else {
+                    <div class="login-prompt">
+                      <mat-icon>rate_review</mat-icon>
+                      <p>Only verified logged-in customers can submit reviews.</p>
+                      <a routerLink="/login" mat-stroked-button color="primary">Sign In to Review</a>
+                    </div>
+                  }
+                </div>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+
+        <!-- Booking Sidebar -->
+        <aside class="booking-sidebar glassmorphism">
+          <h3 class="sidebar-title">Book Tour</h3>
+          
+          <div class="pricing-display">
+            @if (packageData.isLastMinute && packageData.lastMinutePrice) {
+              <span class="label">Last-Minute Discount Price:</span>
+              <span class="old-price">${{ packageData.price }}</span>
+              <span class="current-price discount">${{ packageData.lastMinutePrice }}</span>
+            } @else {
+              <span class="label">Standard Tour Price:</span>
+              <span class="current-price">${{ packageData.price }}</span>
+            }
+            <span class="note">per person (all taxes included)</span>
+          </div>
+
+          <div class="booking-inputs">
+            <div class="input-item">
+              <label class="input-label">Select Travel Date</label>
+              <input type="date" [value]="travelDate()" (change)="onDateChange($event)" class="date-input-element">
+            </div>
+
+            <button mat-flat-button color="primary" id="book-now-btn" (click)="bookPackage()" [disabled]="bookingLoading()" class="booking-btn book-standard">
+              @if (bookingLoading()) {
+                <span>Processing...</span>
+              } @else {
+                <mat-icon>airplane_ticket</mat-icon> Book Standard Tour
+              }
+            </button>
+
+            <div class="divider-text">OR</div>
+
+            <a [routerLink]="['/custom-builder']" [queryParams]="{basePackage: packageData._id}" mat-stroked-button class="booking-btn customize-btn">
+              <mat-icon>tune</mat-icon> Customize Hotel & Activities
+            </a>
+          </div>
+
+          <div class="guarantee-box">
+            <mat-icon>shield</mat-icon>
+            <div>
+              <h6>Best Rate Guaranteed</h6>
+              <p>Kitty subscription members gain 10% cash back in points.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,22 @@
+<div class="admin-wrapper">
+  <div class="admin-header">
+    <h2>Management Dashboard & CRM</h2>
+    <p>Admin tools to update holiday inventory, publish flash sales, and moderate traveler registrations.</p>
+  </div>
+
+  <mat-tab-group class="admin-tabs glassmorphism" animationDuration="250ms">
+    <!-- Tab 1: Bookings Tracker -->
+    <mat-tab label="Customer Bookings Tracker">
+      <div class="tab-content">
+        <app-bookings-tracker></app-bookings-tracker>
+      </div>
+    </mat-tab>
+
+    <!-- Tab 2: Package Inventory CRUD -->
+    <mat-tab label="Vacation Inventory Manager">
+      <div class="tab-content">
+        <app-inventory-manager></app-inventory-manager>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

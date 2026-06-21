@@ -1,0 +1,156 @@
+<div class="two-columns-admin">
+  <!-- Package Form -->
+  <div class="form-column">
+    <mat-card class="form-card-admin">
+      <mat-card-content class="form-card-content">
+        <h3>{{ isEditing() ? 'Modify Package: #' + currentEditId()?.substring(0, 8) : 'Create New Vacation Package' }}</h3>
+        
+        <form [formGroup]="packageForm" (ngSubmit)="onSubmit()" class="admin-crud-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Package Title</mat-label>
+            <input matInput formControlName="title" placeholder="e.g. Swiss Alps Adventure">
+            @if (packageForm.get('title')?.invalid && packageForm.get('title')?.touched) {
+              <mat-error>Title must be at least 3 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput rows="3" formControlName="description" placeholder="Provide details about the tour..."></textarea>
+          </mat-form-field>
+
+          <div class="form-row-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Base Price ($)</mat-label>
+              <input matInput type="number" formControlName="price">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Destination Location</mat-label>
+              <input matInput formControlName="location" placeholder="e.g. Tokyo, Japan">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Hotel category</mat-label>
+              <mat-select formControlName="starCategory">
+                <mat-option [value]="3">3 Star Property</mat-option>
+                <mat-option [value]="4">4 Star Property</mat-option>
+                <mat-option [value]="5">5 Star Property</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tour Travel Type</mat-label>
+              <mat-select formControlName="travelType">
+                <mat-option value="standard">Standard Holiday</mat-option>
+                <mat-option value="custom">Customizable Builder</mat-option>
+                <mat-option value="group">Group Guided Tour</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Inclusions Checkboxes -->
+          <div class="inclusions-check-group">
+            <label class="section-label">Default Package Inclusions</label>
+            <div class="checkbox-row-grid">
+              <mat-checkbox formControlName="airportPickup" color="primary">Airport Pickup</mat-checkbox>
+              <mat-checkbox formControlName="breakfast" color="primary">Complimentary Breakfast</mat-checkbox>
+              <mat-checkbox formControlName="dinnerBuffet" color="primary">Dinner Buffet</mat-checkbox>
+              <mat-checkbox formControlName="visaServices" color="primary">Visa Services</mat-checkbox>
+            </div>
+          </div>
+
+          <!-- Amenities Checkboxes -->
+          <div class="inclusions-check-group">
+            <label class="section-label">Hotel Amenities Available</label>
+            <div class="checkbox-row-grid">
+              <mat-checkbox formControlName="wifi" color="primary">Free Wi-Fi</mat-checkbox>
+              <mat-checkbox formControlName="pool" color="primary">Swimming Pool</mat-checkbox>
+              <mat-checkbox formControlName="gym" color="primary">Fitness Gym</mat-checkbox>
+              <mat-checkbox formControlName="bar" color="primary">Bar / Lounge</mat-checkbox>
+            </div>
+          </div>
+
+          <!-- Comma separated array values -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Activities (Comma separated)</mat-label>
+            <input matInput formControlName="activities" placeholder="e.g. Cruise tour, Museum entry, Guided Walk">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tourist Spots Covered (Comma separated)</mat-label>
+            <input matInput formControlName="touristPlaces" placeholder="e.g. Eiffel Tower, Louvre, Notre Dame">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Image URLs (Comma separated)</mat-label>
+            <input matInput formControlName="images" placeholder="e.g. https://images.unsplash.com/...jpg">
+          </mat-form-field>
+
+          <!-- Last minute deals controls -->
+          <div class="deals-config-box">
+            <mat-checkbox formControlName="isLastMinute" color="primary">Mark as Last-Minute Deal</mat-checkbox>
+            @if (packageForm.get('isLastMinute')?.value) {
+              <mat-form-field appearance="outline" class="full-width margin-top-10">
+                <mat-label>Discount Deal Price ($)</mat-label>
+                <input matInput type="number" formControlName="lastMinutePrice">
+              </mat-form-field>
+            }
+          </div>
+
+          <!-- Itinerary raw text area -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Itinerary Day-by-Day (Format: Day Title - Details (one plan per line) OR JSON array)</mat-label>
+            <textarea matInput rows="6" formControlName="itineraryRaw" placeholder="Day 1: Arrival - Welcome to our hotel...&#13;Day 2: City tour - Visit key temples..."></textarea>
+          </mat-form-field>
+
+          <div class="form-actions-row">
+            @if (isEditing()) {
+              <button mat-stroked-button type="button" (click)="cancelEdit()">Cancel Edit</button>
+            }
+            <button mat-flat-button color="primary" type="submit" [disabled]="packageForm.invalid || formSubmitting()">
+              @if (formSubmitting()) {
+                <span>Saving...</span>
+              } @else {
+                <span>{{ isEditing() ? 'Update Package' : 'Publish Package' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Inventory List -->
+  <div class="list-column">
+    <h3>Published Package Catalog ({{ packages().length }})</h3>
+    
+    @if (isLoadingPackages()) {
+      <div class="spinner-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+      <div class="inventory-list">
+        @for (pkg of packages(); track pkg._id) {
+          <div class="inventory-item glassmorphism">
+            <div class="item-meta">
+              <strong>{{ pkg.title }}</strong>
+              <span>{{ pkg.location }} | {{ pkg.starCategory }}★ | ${{ pkg.price }}</span>
+              <span class="type-pill-inv" [class]="pkg.travelType">{{ pkg.travelType | uppercase }}</span>
+            </div>
+            <div class="item-actions">
+              <button mat-icon-button color="primary" (click)="editPackage(pkg)" title="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deletePackage(pkg._id!)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

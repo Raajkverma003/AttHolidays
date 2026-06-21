@@ -1,0 +1,158 @@
+<div class="dashboard-wrapper">
+  <!-- Top Welcome banner -->
+  <div class="welcome-banner glassmorphism">
+    <div class="user-info-banner">
+      <h2>Welcome Back, {{ authService.currentUser()?.name }}!</h2>
+      <p>Manage your Travel Kitty subscription and track your itinerary booking requests here.</p>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Left Column: Travel Kitty Subscription details -->
+    <aside class="kitty-sidebar">
+      <mat-card class="kitty-card glassmorphism">
+        <div class="card-header">
+          <mat-icon class="kitty-logo">savings</mat-icon>
+          <h3>AttHolidays Travel Kitty</h3>
+        </div>
+        <mat-card-content class="kitty-info">
+          <div class="current-tier-row">
+            <span class="lbl">Membership Level:</span>
+            <span class="val-tier" [class]="authService.currentUser()?.kittySubscription?.tier?.toLowerCase()">
+              {{ authService.currentUser()?.kittySubscription?.tier }}
+            </span>
+          </div>
+
+          <div class="points-bubble">
+            <span class="points-val">{{ authService.currentUser()?.kittySubscription?.points || 0 }}</span>
+            <span class="points-lbl">Travel Points Balance</span>
+          </div>
+
+          <p class="points-hint">Points are rewarded automatically on bookings (10 points per $100 spent) and can be redeemed for hotel upgrades!</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Manage Tiers Card -->
+      <mat-card class="tiers-management glassmorphism">
+        <div class="card-header">
+          <h3>Manage Subscription</h3>
+        </div>
+        <mat-card-content class="tiers-list">
+          <!-- Bronze Tier Option -->
+          <div class="tier-option bronze-opt" [class.active-sub]="authService.currentUser()?.kittySubscription?.tier === 'Bronze'">
+            <div class="tier-meta">
+              <h5>Bronze Tier</h5>
+              <p>$19/month</p>
+            </div>
+            <button mat-flat-button color="primary" size="small" (click)="changeSubscription('Bronze')" [disabled]="authService.currentUser()?.kittySubscription?.tier === 'Bronze' || isSubscribing()">
+              {{ authService.currentUser()?.kittySubscription?.tier === 'Bronze' ? 'Active' : 'Select' }}
+            </button>
+          </div>
+
+          <!-- Silver Tier Option -->
+          <div class="tier-option silver-opt" [class.active-sub]="authService.currentUser()?.kittySubscription?.tier === 'Silver'">
+            <div class="tier-meta">
+              <h5>Silver Tier</h5>
+              <p>$49/month</p>
+            </div>
+            <button mat-flat-button color="primary" size="small" (click)="changeSubscription('Silver')" [disabled]="authService.currentUser()?.kittySubscription?.tier === 'Silver' || isSubscribing()">
+              {{ authService.currentUser()?.kittySubscription?.tier === 'Silver' ? 'Active' : 'Select' }}
+            </button>
+          </div>
+
+          <!-- Gold Tier Option -->
+          <div class="tier-option gold-opt" [class.active-sub]="authService.currentUser()?.kittySubscription?.tier === 'Gold'">
+            <div class="tier-meta">
+              <h5>Gold Tier</h5>
+              <p>$99/month</p>
+            </div>
+            <button mat-flat-button color="primary" size="small" (click)="changeSubscription('Gold')" [disabled]="authService.currentUser()?.kittySubscription?.tier === 'Gold' || isSubscribing()">
+              {{ authService.currentUser()?.kittySubscription?.tier === 'Gold' ? 'Active' : 'Select' }}
+            </button>
+          </div>
+
+          @if (authService.currentUser()?.kittySubscription?.tier !== 'None') {
+            <button mat-stroked-button color="warn" (click)="changeSubscription('None')" [disabled]="isSubscribing()" class="cancel-btn">
+              Cancel Membership
+            </button>
+          }
+        </mat-card-content>
+      </mat-card>
+    </aside>
+
+    <!-- Right Column: Booking History -->
+    <main class="bookings-history">
+      <div class="section-title-row">
+        <h3>Your Booking Requests</h3>
+      </div>
+
+      @if (isLoading()) {
+        <div class="spinner-container">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+      } @else {
+        <div class="bookings-list">
+          @for (bk of bookings(); track bk._id) {
+            <!-- Parse package data -->
+            @if (bk.package; as packageData) {
+              <!-- Check if package is fully populated or object -->
+              <mat-card class="booking-item-card glassmorphism">
+                <mat-card-content class="booking-item-content">
+                  <div class="booking-header">
+                    <div>
+                      <h4 class="pkg-title">{{ packageData.title }}</h4>
+                      <p class="location-txt"><mat-icon>location_on</mat-icon> {{ packageData.location }}</p>
+                    </div>
+                    <span class="status-pill" [class]="getStatusClass(bk.status)">{{ bk.status | uppercase }}</span>
+                  </div>
+
+                  <div class="booking-details-grid">
+                    <div class="detail-cell">
+                      <span class="lbl">Departure Date</span>
+                      <span class="val">{{ bk.travelDate | date:'longDate' }}</span>
+                    </div>
+                    <div class="detail-cell">
+                      <span class="lbl">Itinerary Type</span>
+                      <span class="val-type" [class]="bk.isCustomized ? 'custom-type' : 'standard-type'">
+                        {{ bk.isCustomized ? 'Customized' : 'Standard' }}
+                      </span>
+                    </div>
+                    <div class="detail-cell">
+                      <span class="lbl">Total Price</span>
+                      <span class="val-price">${{ bk.price }}</span>
+                    </div>
+                  </div>
+
+                  @if (bk.isCustomized && bk.customSelections) {
+                    <div class="custom-selection-review">
+                      <strong>Custom Swaps:</strong>
+                      <span>{{ bk.customSelections.starCategory }}★ Hotel Tier</span>
+                      <span class="divider">|</span>
+                      <span>Inclusions: 
+                        {{ bk.customSelections.inclusions?.airportPickup ? 'Pickup' : '' }} 
+                        {{ bk.customSelections.inclusions?.breakfast ? 'Breakfast' : '' }} 
+                        {{ bk.customSelections.inclusions?.dinnerBuffet ? 'Dinner' : '' }} 
+                        {{ bk.customSelections.inclusions?.visaServices ? 'Visa' : '' }}
+                      </span>
+                      @if (bk.customSelections.activities && bk.customSelections.activities.length > 0) {
+                        <span class="divider">|</span>
+                        <span>Activities: {{ bk.customSelections.activities.join(', ') }}</span>
+                      }
+                    </div>
+                  }
+                </mat-card-content>
+              </mat-card>
+            }
+          } @empty {
+            <div class="no-bookings glassmorphism">
+              <mat-icon class="no-bk-icon">airplane_ticket</mat-icon>
+              <h4>No Bookings Made Yet</h4>
+              <p>You haven't requested any standard or customized vacations yet.</p>
+              <a routerLink="/packages" mat-flat-button color="primary">Explore Vacation Packages</a>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+</div>

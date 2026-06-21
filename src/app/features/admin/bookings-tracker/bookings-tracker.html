@@ -1,0 +1,118 @@
+<div class="bookings-tracker-content">
+  <h3>Traveler Bookings CRM</h3>
+  <p class="tab-subtitle">Approve customized Stepper configurations, process payments, and track tour statuses.</p>
+
+  @if (isLoadingCRM()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else {
+    <div class="crm-table-wrapper">
+      <table class="crm-table">
+        <thead>
+          <tr>
+            <th>Customer Info</th>
+            <th>Destination Package</th>
+            <th>Travel Date</th>
+            <th>Trip Type</th>
+            <th>Custom Config details</th>
+            <th>Price Quote</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (bk of crmBookings(); track bk._id) {
+            <tr>
+              <!-- Customer Details -->
+              <td>
+                <div class="cust-info">
+                  <strong>{{ bk.user?.name || 'Unknown' }}</strong>
+                  <span>{{ bk.user?.email || '' }}</span>
+                  @if (bk.user?.kittySubscription?.tier && bk.user.kittySubscription.tier !== 'None') {
+                    <span class="member-badge" [class]="bk.user.kittySubscription.tier.toLowerCase()">
+                      {{ bk.user.kittySubscription.tier }} Member
+                    </span>
+                  }
+                </div>
+              </td>
+
+              <!-- Package Title -->
+              <td>
+                <div class="pkg-info">
+                  <strong>{{ bk.package?.title || 'Package Removed' }}</strong>
+                  <span>{{ bk.package?.location || '' }}</span>
+                </div>
+              </td>
+
+              <!-- Date -->
+              <td>{{ bk.travelDate | date:'longDate' }}</td>
+
+              <!-- Type -->
+              <td>
+                <span class="type-pill" [class]="bk.isCustomized ? 'custom' : 'standard'">
+                  {{ bk.isCustomized ? 'Custom' : 'Standard' }}
+                </span>
+              </td>
+
+              <!-- Custom Config -->
+              <td class="custom-selections-cell">
+                @if (bk.isCustomized && bk.customSelections) {
+                  <div class="custom-details-summary">
+                    <span>Hotels: <strong>{{ bk.customSelections.starCategory }}★</strong></span>
+                    <span>Inclusions:
+                      {{ bk.customSelections.inclusions?.airportPickup ? 'Pickup,' : '' }}
+                      {{ bk.customSelections.inclusions?.breakfast ? 'Breakfast,' : '' }}
+                      {{ bk.customSelections.inclusions?.dinnerBuffet ? 'Dinner,' : '' }}
+                      {{ bk.customSelections.inclusions?.visaServices ? 'Visa' : '' }}
+                    </span>
+                    @if (bk.customSelections.activities && bk.customSelections.activities.length > 0) {
+                      <span>Activities: {{ bk.customSelections.activities.slice(0,2).join(', ') }}...</span>
+                    }
+                  </div>
+                } @else {
+                  <span class="fade-txt">Standard Itinerary</span>
+                }
+              </td>
+
+              <!-- Price -->
+              <td><strong class="price-val">${{ bk.price }}</strong></td>
+
+              <!-- Status -->
+              <td>
+                <span class="crm-status-badge" [class]="bk.status">
+                  {{ bk.status | uppercase }}
+                </span>
+              </td>
+
+              <!-- Action buttons -->
+              <td>
+                <div class="crm-actions-col">
+                  @if (bk.status === 'pending') {
+                    <button mat-flat-button color="accent" size="small" (click)="updateBookingStatus(bk._id!, 'approved')" class="action-btn-crm approve">
+                      Approve
+                    </button>
+                  }
+                  @if (bk.status === 'approved') {
+                    <button mat-flat-button color="primary" size="small" (click)="updateBookingStatus(bk._id!, 'completed')" class="action-btn-crm complete">
+                      Complete
+                    </button>
+                  }
+                  @if (bk.status !== 'cancelled' && bk.status !== 'completed') {
+                    <button mat-stroked-button color="warn" size="small" (click)="updateBookingStatus(bk._id!, 'cancelled')" class="action-btn-crm cancel">
+                      Cancel
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="no-records-row">No traveler booking requests registered.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

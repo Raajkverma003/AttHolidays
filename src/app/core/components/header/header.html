@@ -1,0 +1,42 @@
+<header class="app-header">
+  <div class="header-container">
+    <a routerLink="/" class="logo-area">
+      <mat-icon class="logo-icon">flight_takeoff</mat-icon>
+      <span class="logo-text">Att<span class="highlight">Holidays</span></span>
+    </a>
+
+    <nav class="nav-links">
+      <a routerLink="/" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/packages" routerLinkActive="active-nav">Destinations</a>
+      <a routerLink="/custom-builder" routerLinkActive="active-nav">Custom Itinerary</a>
+    </nav>
+
+    <div class="auth-actions">
+      @if (authService.isLoggedIn()) {
+        <span class="welcome-msg">Hello, <strong>{{ authService.currentUser()?.name }}</strong></span>
+        <a routerLink="/dashboard" mat-button class="nav-btn dashboard-btn">
+          <mat-icon>dashboard</mat-icon>
+          Kitty & Bookings
+        </a>
+        @if (authService.isAdmin()) {
+          <a routerLink="/admin" mat-flat-button color="accent" class="nav-btn admin-btn">
+            <mat-icon>admin_panel_settings</mat-icon>
+            Admin
+          </a>
+        }
+        <button mat-stroked-button (click)="logout()" class="nav-btn logout-btn">
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      } @else {
+        <a routerLink="/login" mat-stroked-button class="nav-btn login-btn">Sign In</a>
+        <a routerLink="/register" mat-flat-button color="primary" class="nav-btn register-btn">Sign Up</a>
+      }
+
+      <!-- Theme Switcher at the far right -->
+      <button mat-icon-button (click)="themeService.toggleTheme()" class="theme-toggle-btn" title="Toggle Theme" id="theme-toggle-btn">
+        <mat-icon>{{ themeService.currentTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+</header>

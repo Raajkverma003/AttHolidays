@@ -334,20 +334,106 @@
 }
 
 @media (max-width: 900px) {
-  .catalog-wrapper {
-    flex-direction: column;
-  }
-  .filters-sidebar {
-    width: 100%;
-    position: relative;
-    top: 0;
-  }
   .package-card {
     flex-direction: column !important;
   }
   .card-img-container {
     width: 100%;
-    height: 200px;
+    height: 220px;
+  }
+  .package-content {
+    padding: 20px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalog-wrapper {
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  /* Mobile Filter Bar */
+  .mobile-filter-bar {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    border: 1px solid var(--border-color);
+  }
+
+  .mobile-filter-bar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Filters Sidebar as Drawer */
+  .filters-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    height: 100vh;
+    max-height: 100vh !important;
+    z-index: 1003;
+    padding: 25px 20px;
+    background: var(--glass-bg);
+    border-right: 1px solid var(--border-color);
+    border-left: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-radius: 0 !important;
+    backdrop-filter: blur(25px) saturate(180%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    margin: 0;
+    overflow-y: auto;
+  }
+
+  .filters-sidebar.active {
+    left: 0;
+  }
+
+  .sidebar-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .close-filters-btn {
+    color: var(--text-primary) !important;
+  }
+
+  .mobile-filters-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1002;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  /* Pricing / Actions adjustments for narrow cards */
+  .pricing-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .explore-btn {
+    width: 100%;
+    justify-content: center !important;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 }
 

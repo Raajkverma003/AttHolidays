@@ -1,9 +1,26 @@
 <div class="catalog-wrapper">
+  <!-- Mobile Filter Toggle Bar (sticky at the top on mobile) -->
+  <div class="mobile-filter-bar mobile-only glassmorphism">
+    <button mat-flat-button color="primary" (click)="toggleMobileFilters()" class="toggle-filters-btn">
+      <mat-icon>filter_list</mat-icon> Filters & Sort
+    </button>
+    <button mat-stroked-button (click)="resetFilters()">Reset All</button>
+  </div>
+
+  @if (showMobileFilters()) {
+    <div class="mobile-filters-backdrop mobile-only" (click)="toggleMobileFilters()"></div>
+  }
+
   <!-- Sidebar Filters -->
-  <aside class="filters-sidebar glassmorphism">
+  <aside class="filters-sidebar glassmorphism" [class.active]="showMobileFilters()">
     <div class="sidebar-header">
       <h3>Filter Packages</h3>
-      <button mat-button color="primary" (click)="resetFilters()">Reset All</button>
+      <div class="sidebar-header-actions">
+        <button mat-button color="primary" (click)="resetFilters()">Reset All</button>
+        <button mat-icon-button (click)="toggleMobileFilters()" class="mobile-only close-filters-btn" aria-label="Close filters">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
 
     <form [formGroup]="filterForm" class="filters-form">

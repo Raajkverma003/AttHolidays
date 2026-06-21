@@ -333,3 +333,45 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  .welcome-banner {
+    padding: 20px;
+  }
+
+  .user-info-banner h2 {
+    font-size: 1.6rem;
+  }
+
+  .user-info-banner p {
+    font-size: 0.9rem;
+  }
+
+  .booking-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .booking-details-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .tier-option {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .tier-option button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

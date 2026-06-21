@@ -5,13 +5,15 @@
       <span class="logo-text">Att<span class="highlight">Holidays</span></span>
     </a>
 
-    <nav class="nav-links">
+    <!-- Desktop Navigation Links (hidden on mobile) -->
+    <nav class="nav-links desktop-only">
       <a routerLink="/" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}">Home</a>
       <a routerLink="/packages" routerLinkActive="active-nav">Destinations</a>
       <a routerLink="/custom-builder" routerLinkActive="active-nav">Custom Itinerary</a>
     </nav>
 
-    <div class="auth-actions">
+    <!-- Desktop Auth Actions (hidden on mobile) -->
+    <div class="auth-actions desktop-only">
       @if (authService.isLoggedIn()) {
         <span class="welcome-msg">Hello, <strong>{{ authService.currentUser()?.name }}</strong></span>
         <a routerLink="/dashboard" mat-button class="nav-btn dashboard-btn">
@@ -38,5 +40,77 @@
         <mat-icon>{{ themeService.currentTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
       </button>
     </div>
+
+    <!-- Mobile Header Actions (visible only on mobile) -->
+    <div class="mobile-header-actions mobile-only">
+      <!-- Theme Switcher always accessible -->
+      <button mat-icon-button (click)="themeService.toggleTheme()" class="theme-toggle-btn" title="Toggle Theme">
+        <mat-icon>{{ themeService.currentTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <!-- Hamburger toggle button -->
+      <button mat-icon-button (click)="toggleMobileMenu()" class="hamburger-btn" aria-label="Toggle Navigation Menu">
+        <mat-icon>{{ isMobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
   </div>
+
+  <!-- Mobile Drawer Overlay & Backdrop -->
+  @if (isMobileMenuOpen()) {
+    <div class="mobile-menu-backdrop" (click)="toggleMobileMenu()"></div>
+    <div class="mobile-menu-drawer glassmorphism open">
+      <div class="drawer-header">
+        <span class="drawer-title">Menu</span>
+        <button mat-icon-button (click)="toggleMobileMenu()" aria-label="Close menu">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <nav class="drawer-nav">
+        <a routerLink="/" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" (click)="toggleMobileMenu()">
+          <mat-icon>home</mat-icon> Home
+        </a>
+        <a routerLink="/packages" routerLinkActive="active-nav" (click)="toggleMobileMenu()">
+          <mat-icon>explore</mat-icon> Destinations
+        </a>
+        <a routerLink="/custom-builder" routerLinkActive="active-nav" (click)="toggleMobileMenu()">
+          <mat-icon>auto_awesome</mat-icon> Custom Itinerary
+        </a>
+      </nav>
+
+      <div class="drawer-divider"></div>
+
+      <div class="drawer-auth">
+        @if (authService.isLoggedIn()) {
+          <div class="drawer-user-info">
+            <mat-icon class="user-avatar">account_circle</mat-icon>
+            <div class="user-details">
+              <span class="user-welcome">Welcome,</span>
+              <span class="user-name">{{ authService.currentUser()?.name }}</span>
+            </div>
+          </div>
+
+          <a routerLink="/dashboard" mat-button class="drawer-btn dashboard-btn" (click)="toggleMobileMenu()">
+            <mat-icon>dashboard</mat-icon>
+            Kitty & Bookings
+          </a>
+
+          @if (authService.isAdmin()) {
+            <a routerLink="/admin" mat-flat-button color="accent" class="drawer-btn admin-btn" (click)="toggleMobileMenu()">
+              <mat-icon>admin_panel_settings</mat-icon>
+              Admin Panel
+            </a>
+          }
+
+          <button mat-stroked-button (click)="logout()" class="drawer-btn logout-btn">
+            <mat-icon>logout</mat-icon>
+            Logout
+          </button>
+        } @else {
+          <a routerLink="/login" mat-stroked-button class="drawer-btn login-btn" (click)="toggleMobileMenu()">Sign In</a>
+          <a routerLink="/register" mat-flat-button color="primary" class="drawer-btn register-btn" (click)="toggleMobileMenu()">Sign Up</a>
+        }
+      </div>
+    </div>
+  }
 </header>

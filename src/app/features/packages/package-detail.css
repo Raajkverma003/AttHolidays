@@ -605,3 +605,77 @@
   line-height: 1.4;
 }
 
+@media (max-width: 768px) {
+  .detail-hero {
+    min-height: 250px;
+    padding: 30px 0;
+  }
+
+  .package-title {
+    font-size: 1.8rem;
+    letter-spacing: -0.5px;
+  }
+
+  .meta-row {
+    gap: 15px;
+  }
+
+  .meta-item {
+    font-size: 0.85rem;
+  }
+
+  /* Compact Timeline for Mobile */
+  .itinerary-timeline {
+    padding-left: 0;
+    border-left: none;
+    margin-left: 0;
+    gap: 25px;
+  }
+
+  .timeline-badge {
+    position: relative;
+    left: 0;
+    top: 0;
+    display: inline-block;
+    margin-bottom: 8px;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+  }
+
+  .timeline-content h4 {
+    font-size: 1.05rem;
+  }
+
+  /* Inclusions/Amenities Grid spacing */
+  .inclusions-grid, .amenities-grid-detail {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .inclusion-box, .amenity-box-detail {
+    padding: 15px;
+  }
+
+  /* Review Summary stacking */
+  .reviews-summary {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .review-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .booking-sidebar {
+    padding: 20px;
+  }
+}
+
+

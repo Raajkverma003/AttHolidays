@@ -29,3 +29,16 @@
   flex-direction: column;
   gap: 20px;
 }
+
+@media (max-width: 768px) {
+  .admin-wrapper {
+    margin: 20px auto 0;
+  }
+  .admin-header h2 {
+    font-size: 1.6rem;
+  }
+  .tab-content {
+    padding: 20px 5px;
+  }
+}
+

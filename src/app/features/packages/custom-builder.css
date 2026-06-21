@@ -346,3 +346,33 @@
     top: 0;
   }
 }
+
+@media (max-width: 768px) {
+  .dest-preview-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .preview-img {
+    width: 100%;
+    height: 180px;
+  }
+  .preview-text {
+    width: 100%;
+  }
+  .summary-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .summary-item .val {
+    text-align: left;
+    max-width: 100%;
+  }
+  ::ng-deep .mat-stepper-horizontal {
+    flex-direction: column !important;
+  }
+  ::ng-deep .mat-horizontal-stepper-header-container {
+    flex-wrap: wrap !important;
+  }
+}
+

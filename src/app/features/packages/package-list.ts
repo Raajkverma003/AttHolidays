@@ -41,6 +41,7 @@ export class PackageList implements OnInit {
 
   protected readonly packages = signal<TravelPackage[]>([]);
   protected readonly isLoading = signal(true);
+  protected readonly showMobileFilters = signal(false);
 
   protected readonly filterForm = this.fb.group({
     location: [''],
@@ -112,5 +113,9 @@ export class PackageList implements OnInit {
       bar: false
     });
     this.fetchPackages();
+  }
+
+  toggleMobileFilters() {
+    this.showMobileFilters.update(show => !show);
   }
 }

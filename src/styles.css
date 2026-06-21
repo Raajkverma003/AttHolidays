@@ -290,6 +290,39 @@ input, textarea, select {
   color: #ffffff !important;
 }
 
+/* Responsive Layout Utilities */
+.mobile-hide {
+  display: inherit;
+}
+
+.mobile-show,
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-hide,
+  .desktop-only {
+    display: none !important;
+  }
+  
+  .mobile-show {
+    display: inherit !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  /* Universal container width adjustments on mobile */
+  .header-container,
+  .catalog-wrapper,
+  .main-grid,
+  .kitty-intro-content,
+  .services-overview {
+    width: 92% !important;
+  }
+}
 
 
 

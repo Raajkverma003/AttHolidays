@@ -19,6 +19,7 @@ app.use(cors());
 
 // DB Connection
 let dbPromise = null;
+let lastDbError = null;
 
 const connectDB = () => {
   if (dbPromise) return dbPromise;
@@ -27,6 +28,7 @@ const connectDB = () => {
   if (!connStr) {
     const errorMsg = 'MONGO_URI is not defined in the environment variables.';
     console.error(`CRITICAL ERROR: ${errorMsg}`);
+    lastDbError = errorMsg;
     if (!process.env.VERCEL) {
       process.exit(1);
     }
@@ -36,9 +38,11 @@ const connectDB = () => {
   dbPromise = mongoose.connect(connStr)
     .then(() => {
       console.log('MongoDB connected successfully');
+      lastDbError = null;
     })
     .catch(err => {
       console.error('MongoDB database connection error:', err.message);
+      lastDbError = err.message;
       dbPromise = null; // Reset promise so subsequent requests can retry
       if (!process.env.VERCEL) {
         process.exit(1);
@@ -84,6 +88,7 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
     database: dbStatus,
+    databaseError: lastDbError,
     timestamp: new Date() 
   });
 });

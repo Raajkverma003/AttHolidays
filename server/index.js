@@ -4,7 +4,12 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 // Load env vars
-dotenv.config();
+const fs = require('fs');
+const path = require('path');
+const envPath = fs.existsSync(path.join(__dirname, '.env'))
+  ? path.join(__dirname, '.env')
+  : path.join(__dirname, '..', '.env');
+dotenv.config({ path: envPath });
 
 const app = express();
 

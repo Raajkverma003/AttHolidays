@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError, of } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface User {
   id: string;
@@ -21,7 +22,7 @@ export interface User {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly apiUrl = 'http://localhost:5001/api/auth';
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   // Signals for state
   readonly currentUser = signal<User | null>(null);
@@ -33,6 +34,9 @@ export class AuthService {
   }
 
   private loadTokenAndUser() {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     if (token && savedUser) {
@@ -68,15 +72,19 @@ export class AuthService {
 
   private handleAuthSuccess(res: any) {
     if (res.token && res.user) {
-      localStorage.setItem('token', res.token);
-      localStorage.setItem('user', JSON.stringify(res.user));
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.user));
+      }
       this.currentUser.set(res.user);
     }
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
@@ -90,7 +98,9 @@ export class AuthService {
     if (user) {
       const updated = { ...user, kittySubscription };
       this.currentUser.set(updated);
-      localStorage.setItem('user', JSON.stringify(updated));
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(updated));
+      }
     }
   }
 

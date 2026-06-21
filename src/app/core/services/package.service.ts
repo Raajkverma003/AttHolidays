@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Review {
   username: string;
@@ -58,7 +59,7 @@ export interface TravelPackage {
 })
 export class PackageService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5001/api/packages';
+  private readonly apiUrl = `${environment.apiUrl}/packages`;
 
   getPackages(filters?: {
     price?: number;

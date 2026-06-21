@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { TravelPackage } from './package.service';
 import { User } from './auth.service';
 
@@ -51,7 +52,7 @@ export interface PopulatedBooking {
 })
 export class BookingService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5001/api/bookings';
+  private readonly apiUrl = `${environment.apiUrl}/bookings`;
 
   getBookings(): Observable<PopulatedBooking[]> {
     return this.http.get<PopulatedBooking[]>(this.apiUrl);

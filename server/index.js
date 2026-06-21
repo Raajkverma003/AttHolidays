@@ -23,17 +23,36 @@ const connectDB = async () => {
     const connStr = process.env.MONGO_URI;
     if (!connStr) {
       console.error('CRITICAL ERROR: MONGO_URI is not defined in the environment variables.');
-      process.exit(1);
+      if (!process.env.VERCEL) {
+        process.exit(1);
+      }
+      return;
     }
     await mongoose.connect(connStr);
     console.log('MongoDB connected successfully');
   } catch (err) {
     console.error('MongoDB database connection error:', err.message);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 };
 
 connectDB();
+
+// Database status check middleware for routes
+app.use((req, res, next) => {
+  if (req.path === '/api/health') {
+    return next();
+  }
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(500).json({
+      error: 'Database connection is not established.',
+      message: 'Ensure MONGO_URI is correctly configured in your Vercel Environment Variables. If you are deploying to production, this must be a remote cloud MongoDB Atlas connection, not a local (localhost) database.'
+    });
+  }
+  next();
+});
 
 // Mount Routes
 app.use('/api/auth', require('./routes/auth'));
